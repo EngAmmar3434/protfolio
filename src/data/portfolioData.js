@@ -405,6 +405,6 @@ export const contactLinks = {
   email: "mailto:engammarhafez@gmail.com",
   linkedin: "https://www.linkedin.com/in/ammar-a-1ba654321",
   github: "https://github.com/EngAmmar3434",
-  cv: "",
+  cv: "/Ammar_Hafez_Resume.pdf",
   phone: "",
 };
