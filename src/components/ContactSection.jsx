@@ -76,6 +76,7 @@ export default function ContactSection() {
           <div className="relative mt-12 flex flex-col justify-between gap-3 border-t border-white/10 pt-5 text-sm text-white/42 md:flex-row">
             <p>{profile.fullName}</p>
             <p>{profile.location}</p>
+            <p>{profile.email}</p>
           </div>
         </div>
       </div>

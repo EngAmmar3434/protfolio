@@ -1,6 +1,7 @@
 export const profile = {
   fullName: "Ammar Mohammed Bashar Hafez",
   displayName: "Ammar Hafez",
+  email: 'engammarhafez@gmail.com',
   title: "Computer Engineering Student",
   intro:
     "Second-year Computer Engineering student at King Khalid University with a 5.0/5.0 GPA, focused on AI, machine learning, embedded systems, and robotics.",
