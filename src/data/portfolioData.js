@@ -86,6 +86,7 @@ export const sectionContent = {
 export const heroModules = [
   {
     id: "ai-ml",
+    image: "/assets/rings/ring-ai-ml.png",
     icon: "Brain",
     label: "AI/ML",
     eyebrow: "Module 01",
@@ -100,6 +101,7 @@ export const heroModules = [
   },
   {
     id: "research",
+    image: "/assets/rings/ring-research.png",
     icon: "Atom",
     label: "Research",
     eyebrow: "Module 02",
@@ -114,6 +116,7 @@ export const heroModules = [
   },
   {
     id: "embedded",
+    image: "/assets/rings/ring-embedded.png",
     icon: "Cpu",
     label: "Embedded",
     eyebrow: "Module 03",
@@ -128,6 +131,7 @@ export const heroModules = [
   },
   {
     id: "robotics",
+    image: "/assets/rings/ring-robotics.png",
     icon: "Bot",
     label: "Robotics",
     eyebrow: "Module 04",
@@ -142,6 +146,7 @@ export const heroModules = [
   },
   {
     id: "web",
+    image: "/assets/rings/ring-web.png",
     icon: "CircuitBoard",
     label: "Web",
     eyebrow: "Module 05",
@@ -156,6 +161,7 @@ export const heroModules = [
   },
   {
     id: "achievements",
+    image: "/assets/rings/ring-achievements.png",
     icon: "Trophy",
     label: "Awards",
     eyebrow: "Module 06",
