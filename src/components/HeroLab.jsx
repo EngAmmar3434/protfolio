@@ -127,327 +127,6 @@ function SideRail({ activeModule, direction, reduceMotion, side, mobile = false 
   );
 }
 
-/*
-function GlassRingCSS({ activeModule, direction, reduceMotion, motionAxis = "vertical", mobile = false }) {
-  const Icon = ICONS[activeModule.icon] ?? Atom;
-  const offsetKey = motionAxis === "horizontal" ? "x" : "y";
-  const motionDistance = mobile ? 118 : 260;
-  const enterOffset =
-    motionAxis === "horizontal"
-      ? direction > 0
-        ? motionDistance
-        : -motionDistance
-      : direction > 0
-        ? -motionDistance
-        : motionDistance;
-  const exitOffset =
-    motionAxis === "horizontal"
-      ? direction > 0
-        ? -motionDistance
-        : motionDistance
-      : direction > 0
-        ? motionDistance
-        : -motionDistance;
-  const ringInitial = reduceMotion
-    ? false
-    : mobile
-      ? { [offsetKey]: enterOffset, opacity: 0, scale: 0.96 }
-      : { [offsetKey]: enterOffset, opacity: 0, scale: 0.82, filter: "blur(20px)" };
-  const ringAnimate = mobile
-    ? { [offsetKey]: 0, opacity: 1, scale: 1 }
-    : { [offsetKey]: 0, opacity: 1, scale: 1, filter: "blur(0px)" };
-  const ringExit = reduceMotion
-    ? undefined
-    : mobile
-      ? { [offsetKey]: exitOffset, opacity: 0, scale: 0.96 }
-      : { [offsetKey]: exitOffset, opacity: 0, scale: 0.82, filter: "blur(20px)" };
-  const ringShellClass = mobile
-    ? "relative isolate grid h-[176px] w-[176px] place-items-center rounded-full min-[390px]:h-[190px] min-[390px]:w-[190px] sm:h-[230px] sm:w-[230px]"
-    : "relative isolate grid h-[180px] w-[180px] place-items-center rounded-full sm:h-[230px] sm:w-[230px] md:h-[270px] md:w-[270px] lg:h-[340px] lg:w-[340px] xl:h-[370px] xl:w-[370px]";
-  const outerGlowClass = mobile
-    ? "absolute inset-[-8%] rounded-full opacity-70 blur-xl"
-    : "absolute inset-[-12%] rounded-full blur-3xl";
-  const baseRingShadow = mobile
-    ? `
-      0 0 22px rgba(86,215,255,0.22),
-      0 0 58px ${activeModule.energy},
-      inset 0 0 24px rgba(255,255,255,0.12),
-      inset 0 0 42px rgba(86,215,255,0.12),
-      inset 0 -28px 62px rgba(1,6,24,0.86)
-    `
-    : `
-      0 0 42px rgba(86,215,255,0.36),
-      0 0 126px ${activeModule.energy},
-      inset 0 0 32px rgba(255,255,255,0.16),
-      inset 0 0 72px rgba(86,215,255,0.16),
-      inset 0 -38px 84px rgba(1,6,24,0.9)
-    `;
-
-  return (
-    <div className="relative grid min-h-[210px] place-items-center min-[390px]:min-h-[224px] sm:min-h-[270px] md:min-h-[310px] lg:min-h-[410px] xl:min-h-[440px]">
-      <AnimatePresence mode={mobile ? "sync" : "wait"} custom={direction}>
-        <motion.div
-          key={activeModule.id}
-          custom={direction}
-          initial={ringInitial}
-          animate={ringAnimate}
-          exit={ringExit}
-          transition={{ duration: reduceMotion ? 0.08 : mobile ? 0.28 : 0.76, ease: [0.2, 0.9, 0.2, 1] }}
-          className={ringShellClass}
-        >
-          <div
-            className="absolute bottom-[-12%] left-1/2 h-12 w-[72%] -translate-x-1/2 rounded-full opacity-75 blur-xl lg:bottom-[-16%] lg:h-24 lg:w-[78%] lg:opacity-100 lg:blur-2xl xl:h-28"
-            style={{
-              background:
-                "radial-gradient(ellipse at center, rgba(86,215,255,0.58), rgba(37,99,235,0.24) 42%, transparent 72%)",
-            }}
-          />
-          <div
-            className={outerGlowClass}
-            style={{
-              background: `radial-gradient(circle, ${activeModule.energy}, rgba(37,99,235,0.14) 36%, transparent 70%)`,
-            }}
-          />
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{
-              background: `
-                radial-gradient(circle at 31% 24%, rgba(255,255,255,0.56), rgba(156,236,255,0.18) 21%, transparent 43%),
-                conic-gradient(from 215deg, rgba(255,255,255,0.88), rgba(86,215,255,0.16) 13%, rgba(2,18,73,0.34) 29%, rgba(0,195,255,0.82) 43%, rgba(2,18,73,0.22) 57%, rgba(203,213,225,0.76) 73%, rgba(0,195,255,0.9) 88%, rgba(255,255,255,0.72)),
-                radial-gradient(circle at 50% 54%, rgba(16,56,155,0.62) 0 52%, rgba(2,11,42,0.82) 63%, rgba(4,35,111,0.74) 78%, rgba(9,68,177,0.48) 100%)
-              `,
-              border: "1px solid rgba(220, 242, 255, 0.5)",
-              boxShadow: baseRingShadow,
-              backdropFilter: mobile ? "blur(12px) saturate(125%)" : "blur(30px) saturate(165%)",
-              WebkitBackdropFilter: mobile ? "blur(12px) saturate(125%)" : "blur(30px) saturate(165%)",
-            }}
-          />
-          <div
-            className="absolute inset-[10%] rounded-full border border-[rgba(156,236,255,0.52)]"
-            style={{
-              boxShadow:
-                "0 0 28px rgba(86,215,255,0.58), inset 0 0 26px rgba(86,215,255,0.26)",
-            }}
-          />
-          <div
-            className="absolute inset-[15.5%] rounded-full"
-            style={{
-              background: `
-                radial-gradient(circle at 31% 25%, rgba(156,236,255,0.42), rgba(37,99,235,0.28) 28%, transparent 46%),
-                radial-gradient(circle at 54% 58%, rgba(37,99,235,0.34), rgba(3,12,45,0.72) 62%, rgba(1,6,24,0.88))
-              `,
-              border: "1px solid rgba(180,232,255,0.44)",
-              boxShadow: `
-                0 0 20px rgba(86,215,255,0.5),
-                inset 0 0 36px rgba(86,215,255,0.2),
-                inset 0 -24px 58px rgba(0,0,0,0.58)
-              `,
-            }}
-          />
-          <div className="absolute left-[14%] top-[12%] h-[24%] w-[66%] -rotate-[16deg] rounded-[50%] bg-[linear-gradient(180deg,rgba(255,255,255,0.34),rgba(255,255,255,0.06)_52%,transparent)] blur-[1px] mix-blend-screen" />
-          <div className="absolute right-[7%] top-[23%] h-[23%] w-[20%] rotate-[38deg] rounded-full bg-[linear-gradient(90deg,transparent,rgba(156,236,255,0.54),transparent)] blur-[0.5px] mix-blend-screen" />
-          <div className="absolute bottom-[2.5%] left-[18%] h-[3.5%] w-[64%] rounded-full bg-[rgba(156,236,255,0.76)] blur-[2px]" />
-          <div className="absolute inset-[0.8%] rounded-full border border-white/24" />
-
-          <motion.div
-            className="relative z-20 grid h-[72px] w-[72px] place-items-center rounded-full sm:h-20 sm:w-20 md:h-24 md:w-24 lg:h-32 lg:w-32 xl:h-36 xl:w-36"
-            animate={reduceMotion || mobile ? false : { y: [0, -8, 0] }}
-            transition={{ duration: 4.4, repeat: Infinity, ease: "easeInOut" }}
-            style={{
-              background: `radial-gradient(circle, rgba(156,236,255,0.18), ${activeModule.energy} 42%, transparent 70%)`,
-              filter: mobile
-                ? "drop-shadow(0 0 12px rgba(156,236,255,0.36))"
-                : "drop-shadow(0 0 24px rgba(156,236,255,0.62))",
-            }}
-          >
-            <Icon
-              aria-hidden="true"
-              strokeWidth={1.55}
-              className="h-12 w-12 text-[var(--lab-white)] sm:h-14 sm:w-14 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-24 xl:w-24"
-              style={{
-                filter: mobile
-                  ? `drop-shadow(0 0 12px rgba(156,236,255,0.56))`
-                  : `drop-shadow(0 0 16px rgba(156,236,255,0.92)) drop-shadow(0 0 36px ${activeModule.energy})`,
-              }}
-            />
-            <span className="sr-only">{activeModule.label}</span>
-          </motion.div>
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-}
-
-function GlassRingImage({ activeModule, direction, reduceMotion, motionAxis = "vertical", mobile = false }) {
-  const Icon = ICONS[activeModule.icon] ?? Atom;
-  const offsetKey = motionAxis === "horizontal" ? "x" : "y";
-  const motionDistance = mobile ? 116 : 260;
-  const enterOffset =
-    motionAxis === "horizontal"
-      ? direction > 0
-        ? motionDistance
-        : -motionDistance
-      : direction > 0
-        ? -motionDistance
-        : motionDistance;
-  const exitOffset =
-    motionAxis === "horizontal"
-      ? direction > 0
-        ? -motionDistance
-        : motionDistance
-      : direction > 0
-        ? motionDistance
-        : -motionDistance;
-  const rotateKey = motionAxis === "horizontal" ? "rotateY" : "rotateX";
-  const enterRotation = mobile
-    ? direction > 0
-      ? -7
-      : 7
-    : direction > 0
-      ? -11
-      : 11;
-  const exitRotation = mobile
-    ? direction > 0
-      ? -7
-      : 7
-    : direction > 0
-      ? 13
-      : -13;
-  const ringInitial = reduceMotion
-    ? false
-    : {
-        [offsetKey]: enterOffset,
-        [rotateKey]: enterRotation,
-        opacity: 0,
-        rotateZ: mobile ? 0 : direction > 0 ? -2.5 : 2.5,
-        scale: mobile ? 0.94 : 0.82,
-      };
-  const ringAnimate = {
-    [offsetKey]: 0,
-    [rotateKey]: 0,
-    opacity: 1,
-    rotateZ: 0,
-    scale: 1,
-  };
-  const ringExit = reduceMotion
-    ? undefined
-    : {
-        [offsetKey]: exitOffset,
-        [rotateKey]: exitRotation,
-        opacity: 0,
-        rotateZ: mobile ? 0 : direction > 0 ? 2.5 : -2.5,
-        scale: mobile ? 0.94 : 0.78,
-      };
-  const ringShellClass = mobile
-    ? "relative isolate grid h-[184px] w-[184px] place-items-center min-[390px]:h-[198px] min-[390px]:w-[198px] sm:h-[238px] sm:w-[238px]"
-    : "relative isolate grid h-[184px] w-[184px] place-items-center sm:h-[238px] sm:w-[238px] md:h-[280px] md:w-[280px] lg:h-[350px] lg:w-[350px] xl:h-[380px] xl:w-[380px]";
-  const iconShellClass = mobile
-    ? "absolute left-1/2 top-1/2 z-20 grid h-[38%] w-[38%] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full"
-    : "absolute left-1/2 top-1/2 z-20 grid h-[40%] w-[40%] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full";
-
-  return (
-    <div className="relative grid min-h-[214px] place-items-center min-[390px]:min-h-[230px] sm:min-h-[284px] md:min-h-[324px] lg:min-h-[430px] xl:min-h-[456px]">
-      <AnimatePresence mode={mobile ? "sync" : "wait"} custom={direction}>
-        <motion.div
-          key={activeModule.id}
-          custom={direction}
-          initial={ringInitial}
-          animate={ringAnimate}
-          exit={ringExit}
-          transition={{ duration: reduceMotion ? 0.08 : mobile ? 0.3 : 0.72, ease: [0.2, 0.9, 0.2, 1] }}
-          className={ringShellClass}
-          style={{
-            transformPerspective: mobile ? 720 : 980,
-            transformStyle: "preserve-3d",
-          }}
-        >
-          <div
-            aria-hidden="true"
-            className="absolute bottom-[3%] left-1/2 h-[15%] w-[66%] -translate-x-1/2 rounded-full blur-xl lg:blur-2xl"
-            style={{
-              background:
-                "radial-gradient(ellipse at center, rgba(86,215,255,0.58), rgba(37,99,235,0.28) 42%, transparent 72%)",
-              opacity: mobile ? 0.62 : 0.88,
-            }}
-          />
-
-          <img
-            src={ringImage}
-            alt=""
-            aria-hidden="true"
-            draggable="false"
-            className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain"
-            style={{
-              filter: mobile
-                ? "drop-shadow(0 0 18px rgba(86,215,255,0.2)) saturate(1.05)"
-                : "drop-shadow(0 0 28px rgba(86,215,255,0.3)) drop-shadow(0 0 54px rgba(37,99,235,0.18)) saturate(1.08)",
-              opacity: mobile ? 0.92 : 0.98,
-              transform: "scale(1.36)",
-              transformOrigin: "50% 50%",
-            }}
-          />
-
-          <div
-            aria-hidden="true"
-            className={iconShellClass}
-            style={{
-              background: `
-                radial-gradient(circle at 32% 24%, rgba(247,251,255,0.22), transparent 28%),
-                radial-gradient(circle at 50% 56%, rgba(37,99,235,0.5), rgba(2,11,42,0.94) 66%, rgba(1,6,24,0.98))
-              `,
-              border: "1px solid rgba(156,236,255,0.52)",
-              boxShadow: mobile
-                ? `
-                  0 0 20px rgba(86,215,255,0.2),
-                  inset 0 0 18px rgba(86,215,255,0.16),
-                  inset 0 -18px 34px rgba(0,0,0,0.58)
-                `
-                : `
-                  0 0 28px rgba(86,215,255,0.28),
-                  0 0 58px ${activeModule.energy},
-                  inset 0 0 26px rgba(86,215,255,0.2),
-                  inset 0 -22px 48px rgba(0,0,0,0.62)
-                `,
-            }}
-          />
-
-          <div
-            aria-hidden="true"
-            className="absolute left-1/2 top-1/2 z-30 h-[31%] w-[31%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-xl"
-            style={{
-              background: `radial-gradient(circle, ${activeModule.energy}, rgba(86,215,255,0.12) 48%, transparent 72%)`,
-              opacity: mobile ? 0.3 : 0.42,
-            }}
-          />
-
-          <motion.div
-            className="relative z-40 grid h-[68px] w-[68px] place-items-center rounded-full sm:h-20 sm:w-20 md:h-24 md:w-24 lg:h-32 lg:w-32 xl:h-36 xl:w-36"
-            animate={reduceMotion || mobile ? false : { y: [0, -5, 0], scale: [1, 1.015, 1] }}
-            transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <Icon
-              aria-hidden="true"
-              strokeWidth={1.5}
-              className="h-11 w-11 text-[var(--lab-white)] sm:h-14 sm:w-14 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-24 xl:w-24"
-              style={{
-                filter: mobile
-                  ? "drop-shadow(0 0 10px rgba(156,236,255,0.58))"
-                  : `drop-shadow(0 0 16px rgba(156,236,255,0.9)) drop-shadow(0 0 34px ${activeModule.energy})`,
-              }}
-            />
-            <span className="sr-only">{activeModule.label}</span>
-          </motion.div>
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-}
-
-function GlassRing(props) {
-  return USE_IMAGE_RING ? <GlassRingImage {...props} /> : <GlassRingCSS {...props} />;
-}
-*/
-
 function GlassRing({ activeModule, direction, reduceMotion, motionAxis = "vertical", mobile = false }) {
   const offsetKey = motionAxis === "horizontal" ? "x" : "y";
   const rotateKey = motionAxis === "horizontal" ? "rotateY" : "rotateX";
@@ -468,6 +147,8 @@ function GlassRing({ activeModule, direction, reduceMotion, motionAxis = "vertic
       : direction > 0
         ? motionDistance
         : -motionDistance;
+
+  // ✅ FIX 1 — الجوال: عكس إشارة exitRotation لتكون معاكسة لـ enterRotation
   const enterRotation = mobile
     ? direction > 0
       ? -5
@@ -477,11 +158,12 @@ function GlassRing({ activeModule, direction, reduceMotion, motionAxis = "vertic
       : 10;
   const exitRotation = mobile
     ? direction > 0
-      ? -5
-      : 5
+      ? 5      // ✅ كانت -5 (خطأ) — صارت 5 (صح)
+      : -5     // ✅ كانت  5 (خطأ) — صارت -5 (صح)
     : direction > 0
       ? 12
       : -12;
+
   const ringInitial = reduceMotion
     ? false
     : {
@@ -514,7 +196,8 @@ function GlassRing({ activeModule, direction, reduceMotion, motionAxis = "vertic
 
   return (
     <div className="relative grid min-h-[236px] place-items-center min-[390px]:min-h-[258px] sm:min-h-[318px] md:min-h-[360px] lg:min-h-[456px] xl:min-h-[488px]">
-      <AnimatePresence mode={mobile ? "sync" : "wait"} custom={direction}>
+      {/* ✅ FIX 2 — استبدال mode="sync" بـ mode="wait" في جميع الحالات */}
+      <AnimatePresence mode="wait" custom={direction}>
         <motion.div
           key={activeModule.id}
           custom={direction}
@@ -526,6 +209,8 @@ function GlassRing({ activeModule, direction, reduceMotion, motionAxis = "vertic
           style={{
             transformPerspective: mobile ? 720 : 980,
             transformStyle: "preserve-3d",
+            // ✅ FIX 3 — position: absolute في الجوال لمنع اضطراب الـ layout أثناء الـ exit animation
+            position: mobile ? "absolute" : undefined,
           }}
         >
           <img
@@ -633,8 +318,6 @@ export default function HeroLab() {
       const scrollRange = Math.max(1, wrapper.offsetHeight - window.innerHeight);
       const progress = clamp(-rect.top / scrollRange, 0, 1);
 
-      // The hero wrapper is intentionally one viewport taller than the number of modules.
-      // This gives the final glass ring a full readable moment before the page exits the pinned hero.
       const nextIndex = clamp(
         Math.floor(progress * heroModules.length),
         0,
