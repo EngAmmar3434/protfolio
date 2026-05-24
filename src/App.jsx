@@ -10,7 +10,8 @@ import ProofSections from "./components/ProofSections";
 function App() {
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) return undefined;
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    if (reduceMotion || isMobile) return undefined;
 
     const lenis = new Lenis({
       duration: 1.15,

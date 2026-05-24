@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
 const DEFAULT_STAR_COLOR = "#56d7ff";
+const MOBILE_QUERY = "(max-width: 767px)";
 
 function hexToRgb(hex) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -35,11 +36,19 @@ export default function AnimatedBackground({
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
+    const mobileQuery = window.matchMedia(MOBILE_QUERY);
 
     let width = 0;
     let height = 0;
     let animationId = 0;
     let tick = 0;
+    let settings = {
+      count,
+      dprLimit: 2,
+      isMobile: false,
+      speed,
+      twinkle,
+    };
 
     const maxDepth = 1500;
     const rgb = hexToRgb(starColor);
@@ -54,9 +63,22 @@ export default function AnimatedBackground({
 
     let stars = [];
 
+    const getSettings = () => {
+      const isMobile = mobileQuery.matches;
+
+      return {
+        count: isMobile ? Math.min(count, 150) : count,
+        dprLimit: isMobile ? 1.5 : 2,
+        isMobile,
+        speed: isMobile ? Math.min(speed, 0.24) : speed,
+        twinkle: twinkle && !isMobile,
+      };
+    };
+
     const setupCanvas = () => {
       const rect = container.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
+      settings = getSettings();
+      const dpr = Math.min(window.devicePixelRatio || 1, settings.dprLimit);
 
       width = rect.width || window.innerWidth;
       height = rect.height || window.innerHeight;
@@ -69,7 +91,7 @@ export default function AnimatedBackground({
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      stars = Array.from({ length: count }, () => createStar());
+      stars = Array.from({ length: settings.count }, () => createStar());
 
       ctx.fillStyle = "#020617";
       ctx.fillRect(0, 0, width, height);
@@ -85,7 +107,7 @@ export default function AnimatedBackground({
       const centerY = height / 2;
 
       for (const star of stars) {
-        star.z -= speed * 2.2;
+        star.z -= settings.speed * 2.2;
 
         if (star.z <= 0) {
           star.x = (Math.random() - 0.5) * width * 2;
@@ -105,7 +127,7 @@ export default function AnimatedBackground({
         const size = Math.max(0.35, depth * 2.45);
         let opacity = depth * 0.55 + 0.08;
 
-        if (twinkle && star.twinkleSpeed > 0.012) {
+        if (settings.twinkle && star.twinkleSpeed > 0.012) {
           opacity *=
             0.75 + 0.25 * Math.sin(tick * star.twinkleSpeed + star.twinkleOffset);
         }
@@ -114,12 +136,12 @@ export default function AnimatedBackground({
         ctx.arc(x, y, size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
         ctx.shadowColor = starColor;
-        ctx.shadowBlur = depth > 0.65 ? 10 : 2;
+        ctx.shadowBlur = settings.isMobile ? (depth > 0.72 ? 3 : 0) : depth > 0.65 ? 10 : 2;
         ctx.globalAlpha = 1;
         ctx.fill();
 
-        if (star.z < maxDepth * 0.28 && speed > 0.25) {
-          const streakLength = depth * speed * 12;
+        if (!settings.isMobile && star.z < maxDepth * 0.28 && settings.speed > 0.25) {
+          const streakLength = depth * settings.speed * 12;
           const angle = Math.atan2(star.y, star.x);
 
           ctx.beginPath();
@@ -143,6 +165,7 @@ export default function AnimatedBackground({
 
     const resizeObserver = new ResizeObserver(setupCanvas);
     resizeObserver.observe(container);
+    mobileQuery.addEventListener("change", setupCanvas);
 
     if (!prefersReducedMotion) {
       animationId = requestAnimationFrame(drawStarfield);
@@ -151,6 +174,7 @@ export default function AnimatedBackground({
     return () => {
       cancelAnimationFrame(animationId);
       resizeObserver.disconnect();
+      mobileQuery.removeEventListener("change", setupCanvas);
     };
   }, [count, speed, starColor, twinkle]);
 
