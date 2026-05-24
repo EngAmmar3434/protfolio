@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { navigationContent, navigationLinks } from "../data/portfolioData";
 
+const MOBILE_QUERY = "(max-width: 767px)";
 const NAVBAR_SHOW_SCROLL_Y = 4508.7998046875;
 
 function scrollToSection(href) {
@@ -17,9 +18,11 @@ export default function Navbar() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia(MOBILE_QUERY);
+
     const onScroll = () => {
       const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-      const visible = window.scrollY >= NAVBAR_SHOW_SCROLL_Y;
+      const visible = mediaQuery.matches || window.scrollY >= NAVBAR_SHOW_SCROLL_Y;
 
       setNavVisible(visible);
       setScrolled(window.scrollY > 42);
@@ -30,7 +33,12 @@ export default function Navbar() {
 
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    mediaQuery.addEventListener("change", onScroll);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      mediaQuery.removeEventListener("change", onScroll);
+    };
   }, []);
 
   const handleLink = (event, href) => {
@@ -50,21 +58,19 @@ export default function Navbar() {
         }`}
       >
         <div
-          className={`mx-auto flex max-w-7xl items-center justify-between rounded-[var(--lab-radius)] border px-4 py-3 backdrop-blur-2xl transition duration-300 ${
-            scrolled
-              ? "border-[var(--lab-border)] bg-[var(--lab-panel-strong)] shadow-[0_12px_60px_rgba(0,0,0,0.28)]"
-              : "border-white/10 bg-[rgba(3,8,24,0.46)]"
+          className={`hud-navbar mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-3 sm:px-4 ${
+            scrolled ? "hud-navbar-scrolled" : ""
           }`}
         >
+          <span aria-hidden="true" className="hud-nav-accent hud-nav-accent-left" />
+          <span aria-hidden="true" className="hud-nav-accent hud-nav-accent-right" />
+
           <a
             href="#home"
             onClick={(event) => handleLink(event, "#home")}
-            className="heading flex items-center gap-3 text-sm font-black uppercase tracking-[0.16em] text-white"
+            className="heading hud-nav-brand lab-interactive lab-clickable flex min-w-0 items-center text-[0.72rem] font-black uppercase tracking-[0.16em] text-white sm:text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--lab-cyan)]"
           >
-            <span className="relative grid h-9 w-9 place-items-center rounded-full border border-[var(--lab-cyan)]/34 bg-[var(--lab-royal)]/18 text-[var(--lab-cyan)] shadow-[0_0_28px_rgba(86,215,255,0.18)]">
-              <span className="mono text-[0.68rem]">{navigationContent.mark}</span>
-            </span>
-            <span className="hidden sm:inline">{navigationContent.brand}</span>
+            <span className="truncate">{navigationContent.brand}</span>
           </a>
 
           <div className="hidden items-center gap-1 lg:flex">
@@ -73,7 +79,7 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={(event) => handleLink(event, link.href)}
-                className="rounded-full px-3 py-2 text-[0.68rem] font-black uppercase tracking-[0.16em] text-white/52 transition duration-200 hover:bg-white/[0.055] hover:text-[var(--lab-cyan)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--lab-cyan)]"
+                className="hud-nav-link lab-interactive lab-clickable inline-flex items-center px-3 py-2 text-[0.68rem] font-black uppercase tracking-[0.16em] text-white/58 transition duration-200 hover:text-[var(--lab-cyan)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--lab-cyan)]"
               >
                 {link.label}
               </a>
@@ -82,9 +88,9 @@ export default function Navbar() {
 
           <div className="flex items-center gap-3">
             <div className="hidden items-center gap-2 md:flex">
-              <div className="h-px w-20 overflow-hidden bg-white/12">
+              <div className="hud-navbar-progress h-px w-20 overflow-hidden">
                 <div
-                  className="h-full bg-[var(--lab-cyan)] transition-[width] duration-200"
+                  className="hud-navbar-progress-fill h-full transition-[width] duration-200"
                   style={{ width: `${Math.round(progress * 100)}%` }}
                 />
               </div>
@@ -96,15 +102,16 @@ export default function Navbar() {
             <a
               href="#contact"
               onClick={(event) => handleLink(event, "#contact")}
-              className="hidden rounded-full bg-[var(--lab-royal-2)] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-white transition duration-200 hover:bg-[var(--lab-royal)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--lab-cyan)] md:inline-flex"
+              className="hud-nav-cta lab-interactive lab-clickable lab-button lab-hover-scan hidden px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-white transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--lab-cyan)] md:inline-flex"
             >
-              {navigationContent.contactLabel}
+              <span aria-hidden="true" className="lab-scan-line" />
+              <span className="relative z-10">{navigationContent.contactLabel}</span>
             </a>
 
             <button
               type="button"
               onClick={() => setMobileOpen((open) => !open)}
-              className="grid h-10 w-10 place-items-center rounded-full border border-white/12 bg-white/[0.04] text-white transition duration-200 hover:border-[var(--lab-cyan)]/38 hover:text-[var(--lab-cyan)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--lab-cyan)] lg:hidden"
+              className="hud-nav-toggle lab-interactive lab-clickable grid h-10 w-10 place-items-center text-white transition duration-200 hover:text-[var(--lab-cyan)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--lab-cyan)] lg:hidden"
               aria-label="Toggle navigation"
             >
               {mobileOpen ? <X aria-hidden="true" size={20} /> : <Menu aria-hidden="true" size={20} />}
@@ -122,13 +129,13 @@ export default function Navbar() {
             transition={{ duration: 0.22 }}
             className="fixed inset-x-4 top-[82px] z-40 lg:hidden"
           >
-            <div className="lab-panel p-3">
+            <div className="hud-navbar-panel max-h-[calc(100svh-96px)] overflow-y-auto p-3">
               {navigationLinks.map((link, index) => (
                 <a
                   key={link.href}
                   href={link.href}
                   onClick={(event) => handleLink(event, link.href)}
-                  className="flex items-center justify-between rounded-[var(--lab-radius)] px-4 py-3 text-sm font-black uppercase tracking-[0.14em] text-white/62 transition duration-200 hover:bg-white/[0.055] hover:text-[var(--lab-cyan)]"
+                  className="hud-nav-link hud-nav-panel-link lab-interactive lab-clickable flex items-center justify-between px-4 py-3 text-sm font-black uppercase tracking-[0.14em] text-white/66 transition duration-200 hover:text-[var(--lab-cyan)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--lab-cyan)]"
                 >
                   <span>{link.label}</span>
                   <span className="mono text-[0.62rem] text-white/32">
@@ -140,9 +147,10 @@ export default function Navbar() {
               <a
                 href="#contact"
                 onClick={(event) => handleLink(event, "#contact")}
-                className="block rounded-[var(--lab-radius)] bg-[var(--lab-royal-2)] px-4 py-3 text-center text-sm font-black uppercase tracking-[0.14em] text-white"
+                className="hud-nav-cta lab-interactive lab-clickable lab-button lab-hover-scan block px-4 py-3 text-center text-sm font-black uppercase tracking-[0.14em] text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--lab-cyan)]"
               >
-                {navigationContent.mobileContactLabel}
+                <span aria-hidden="true" className="lab-scan-line" />
+                <span className="relative z-10">{navigationContent.mobileContactLabel}</span>
               </a>
             </div>
           </motion.div>

@@ -36,13 +36,14 @@ export default function ContactSection() {
             <div className="grid gap-3">
               <a
                 href={contactLinks.email}
-                className="hud-label hud-primary group flex items-center justify-between px-5 py-4 font-black uppercase tracking-[0.08em] text-white transition duration-200 hover:border-[var(--lab-cyan)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--lab-cyan)]"
+                className="hud-label hud-primary lab-interactive lab-clickable lab-button lab-hover-scan group flex items-center justify-between px-5 py-4 font-black uppercase tracking-[0.08em] text-white transition duration-200 hover:border-[var(--lab-cyan)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--lab-cyan)]"
               >
-                <span className="flex items-center gap-3">
+                <span aria-hidden="true" className="lab-scan-line" />
+                <span className="relative z-10 flex items-center gap-3">
                   <Mail aria-hidden="true" size={18} />
                   {sectionContent.contact.primaryAction}
                 </span>
-                <ArrowUpRight aria-hidden="true" size={19} />
+                <ArrowUpRight aria-hidden="true" className="relative z-10" size={19} />
               </a>
 
               {optionalLinks.length > 0 && (
@@ -57,14 +58,15 @@ export default function ContactSection() {
                         href={href}
                         target={opensNewTab ? "_blank" : undefined}
                         rel={opensNewTab ? "noreferrer" : undefined}
-                        className={`hud-label flex items-center justify-center gap-2 px-4 py-4 text-sm font-black uppercase tracking-[0.08em] text-white/78 transition duration-200 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 ${
+                        className={`hud-label lab-interactive lab-clickable lab-button lab-hover-scan flex items-center justify-center gap-2 px-4 py-4 text-sm font-black uppercase tracking-[0.08em] text-white/78 transition duration-200 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 ${
                           isCv
                             ? "hover:border-[var(--lab-gold)]/45 focus-visible:outline-[var(--lab-gold)]"
                             : "hover:border-[var(--lab-cyan)]/35 focus-visible:outline-[var(--lab-cyan)]"
                         }`}
                       >
-                        <Icon aria-hidden="true" size={17} />
-                        {label}
+                        <span aria-hidden="true" className="lab-scan-line" />
+                        <Icon aria-hidden="true" className="relative z-10" size={17} />
+                        <span className="relative z-10">{label}</span>
                       </a>
                     );
                   })}

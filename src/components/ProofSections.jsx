@@ -97,9 +97,9 @@ function Projects({ reduceMotion }) {
               whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
               transition={{ duration: 0.48, delay: index * 0.07 }}
               viewport={{ once: true, margin: "-100px" }}
-              className="hud-frame group relative overflow-hidden p-5 md:p-7"
+              className="hud-frame project-hover group relative overflow-hidden p-5 md:p-7"
             >
-              <div className="absolute right-0 top-0 h-full w-1/2 bg-[radial-gradient(circle_at_60%_30%,rgba(37,99,235,0.16),transparent_54%)] opacity-80" />
+              <div className="project-hover-glow absolute right-0 top-0 h-full w-1/2 bg-[radial-gradient(circle_at_60%_30%,rgba(37,99,235,0.16),transparent_54%)] opacity-80" />
               <div className="relative grid gap-7 lg:grid-cols-[0.72fr_1.28fr] lg:items-stretch">
                 <div className="flex min-h-[260px] flex-col justify-between border-b border-white/10 pb-6 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-7">
                   <div>
@@ -116,14 +116,14 @@ function Projects({ reduceMotion }) {
                     </p>
                     <ArrowUpRight
                       aria-hidden="true"
-                      className="text-white/38 transition duration-200 group-hover:text-[var(--lab-cyan)]"
+                      className="project-hover-arrow text-white/38 transition duration-200 group-hover:text-[var(--lab-cyan)]"
                       size={22}
                     />
                   </div>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
-                  <div className="hud-readout p-5">
+                  <div className="hud-readout project-hover-readout p-5">
                     <div className="mb-4 flex items-center gap-3 text-[var(--lab-cyan)]">
                       <Layers3 aria-hidden="true" size={18} />
                       <p className="mono text-[0.65rem] font-black uppercase tracking-[0.2em]">
@@ -132,7 +132,7 @@ function Projects({ reduceMotion }) {
                     </div>
                     <p className="leading-7 text-white/66">{project.problem}</p>
                   </div>
-                  <div className="hud-readout p-5">
+                  <div className="hud-readout project-hover-readout p-5">
                     <div className="mb-4 flex items-center gap-3 text-[var(--lab-cyan)]">
                       <Cpu aria-hidden="true" size={18} />
                       <p className="mono text-[0.65rem] font-black uppercase tracking-[0.2em]">
@@ -141,7 +141,7 @@ function Projects({ reduceMotion }) {
                     </div>
                     <p className="leading-7 text-white/66">{project.system}</p>
                   </div>
-                  <div className="hud-readout p-5 md:col-span-2">
+                  <div className="hud-readout project-hover-readout p-5 md:col-span-2">
                     <p className="mono text-[0.65rem] font-black uppercase tracking-[0.2em] text-[var(--lab-gold)]">
                       {sectionContent.projects.stackLabel}
                     </p>
@@ -149,7 +149,7 @@ function Projects({ reduceMotion }) {
                       {project.stack.map((item) => (
                         <span
                           key={item}
-                          className="hud-label px-3 py-1.5 text-xs font-bold text-white/68"
+                          className="hud-label project-hover-chip px-3 py-1.5 text-xs font-bold text-white/68"
                         >
                           {item}
                         </span>
@@ -300,7 +300,7 @@ function Certificates({ reduceMotion }) {
                     viewport={{ once: true }}
                     className={`hud-readout block border-b border-white/10 p-6 md:border-r md:[&:nth-child(2n)]:border-r-0 md:[&:nth-last-child(-n+2)]:border-b-0 ${
                       hasCredentialUrl
-                        ? "transition duration-200 hover:border-[var(--lab-cyan)]/50 hover:text-white"
+                        ? "lab-interactive lab-clickable hud-hover transition duration-200 hover:border-[var(--lab-cyan)]/50 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--lab-cyan)]"
                         : ""
                     }`}
                   >

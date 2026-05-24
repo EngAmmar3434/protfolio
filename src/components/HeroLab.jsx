@@ -23,10 +23,36 @@ const ICONS = {
   Trophy,
 };
 
+const MOBILE_QUERY = "(max-width: 767px)";
+const SWIPE_THRESHOLD = 40;
+
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
-function SideRail({ activeModule, direction, reduceMotion, side }) {
+function getInitialIsMobile() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia(MOBILE_QUERY).matches;
+}
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(getInitialIsMobile);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(MOBILE_QUERY);
+    const updateIsMobile = () => setIsMobile(mediaQuery.matches);
+
+    updateIsMobile();
+    mediaQuery.addEventListener("change", updateIsMobile);
+
+    return () => mediaQuery.removeEventListener("change", updateIsMobile);
+  }, []);
+
+  return isMobile;
+}
+
+function SideRail({ activeModule, direction, reduceMotion, side, mobile = false }) {
   const isLeft = side === "left";
+  const enterX = mobile ? (direction > 0 ? 28 : -28) : isLeft ? -24 : 24;
+  const exitX = mobile ? (direction > 0 ? -28 : 28) : isLeft ? 24 : -24;
 
   return (
     <aside className="hud-card relative min-h-[104px] overflow-hidden p-2.5 sm:min-h-[136px] sm:p-4 lg:min-h-[300px] lg:p-4 xl:min-h-[320px] xl:p-5">
@@ -39,9 +65,9 @@ function SideRail({ activeModule, direction, reduceMotion, side }) {
         <motion.div
           key={`${side}-${activeModule.id}`}
           custom={direction}
-          initial={reduceMotion ? false : { opacity: 0, x: isLeft ? -24 : 24, filter: "blur(10px)" }}
+          initial={reduceMotion ? false : { opacity: 0, x: enterX, filter: "blur(10px)" }}
           animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-          exit={reduceMotion ? undefined : { opacity: 0, x: isLeft ? 24 : -24, filter: "blur(10px)" }}
+          exit={reduceMotion ? undefined : { opacity: 0, x: exitX, filter: "blur(10px)" }}
           transition={{ duration: reduceMotion ? 0.08 : 0.42, ease: [0.22, 1, 0.36, 1] }}
           className={`relative flex h-full flex-col ${isLeft ? "text-left" : "text-left lg:text-right"}`}
         >
@@ -86,10 +112,13 @@ function SideRail({ activeModule, direction, reduceMotion, side }) {
   );
 }
 
-function GlassRing({ activeModule, direction, reduceMotion }) {
+function GlassRing({ activeModule, direction, reduceMotion, motionAxis = "vertical" }) {
   const Icon = ICONS[activeModule.icon] ?? Atom;
-  const enterY = direction > 0 ? -260 : 260;
-  const exitY = direction > 0 ? 260 : -260;
+  const offsetKey = motionAxis === "horizontal" ? "x" : "y";
+  const enterOffset =
+    motionAxis === "horizontal" ? (direction > 0 ? 260 : -260) : direction > 0 ? -260 : 260;
+  const exitOffset =
+    motionAxis === "horizontal" ? (direction > 0 ? -260 : 260) : direction > 0 ? 260 : -260;
 
   return (
     <div className="relative grid min-h-[198px] place-items-center sm:min-h-[270px] md:min-h-[310px] lg:min-h-[410px] xl:min-h-[440px]">
@@ -97,9 +126,17 @@ function GlassRing({ activeModule, direction, reduceMotion }) {
         <motion.div
           key={activeModule.id}
           custom={direction}
-          initial={reduceMotion ? false : { y: enterY, opacity: 0, scale: 0.82, filter: "blur(20px)" }}
-          animate={{ y: 0, opacity: 1, scale: 1, filter: "blur(0px)" }}
-          exit={reduceMotion ? undefined : { y: exitY, opacity: 0, scale: 0.82, filter: "blur(20px)" }}
+          initial={
+            reduceMotion
+              ? false
+              : { [offsetKey]: enterOffset, opacity: 0, scale: 0.82, filter: "blur(20px)" }
+          }
+          animate={{ [offsetKey]: 0, opacity: 1, scale: 1, filter: "blur(0px)" }}
+          exit={
+            reduceMotion
+              ? undefined
+              : { [offsetKey]: exitOffset, opacity: 0, scale: 0.82, filter: "blur(20px)" }
+          }
           transition={{ duration: reduceMotion ? 0.08 : 0.76, ease: [0.2, 0.9, 0.2, 1] }}
           className="relative isolate grid h-[180px] w-[180px] place-items-center rounded-full sm:h-[230px] sm:w-[230px] md:h-[270px] md:w-[270px] lg:h-[340px] lg:w-[340px] xl:h-[370px] xl:w-[370px]"
         >
@@ -197,7 +234,7 @@ function RingControls({ activeIndex, onSelect }) {
           type="button"
           onClick={() => onSelect(index)}
           aria-label={`Activate ${module.label}`}
-          className={`h-2.5 rounded-full transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--lab-cyan)] ${
+          className={`lab-interactive lab-clickable lab-dot-button h-2.5 rounded-full transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--lab-cyan)] ${
             index === activeIndex ? "w-12 bg-[var(--lab-cyan)]" : "w-2.5 bg-white/24 hover:bg-white/44"
           }`}
         />
@@ -206,9 +243,9 @@ function RingControls({ activeIndex, onSelect }) {
   );
 }
 
-function HeroActions() {
+function HeroActions({ compact = false }) {
   return (
-    <div className="hidden items-center gap-3 md:flex">
+    <div className={compact ? "flex flex-wrap items-center justify-center gap-2" : "hidden items-center gap-3 md:flex"}>
       {heroActions.map((action) => {
         const Icon = ICONS[action.icon] ?? ArrowRight;
         const isPrimary = action.variant === "primary";
@@ -217,14 +254,17 @@ function HeroActions() {
           <a
             key={action.href}
             href={action.href}
-            className={`hud-label inline-flex items-center gap-2 px-5 py-3 text-sm font-black uppercase tracking-[0.1em] text-white transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 ${
+            className={`hud-label lab-interactive lab-clickable lab-button lab-hover-scan inline-flex items-center justify-center gap-2 font-black uppercase tracking-[0.1em] text-white transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 ${
+              compact ? "min-h-11 min-w-[136px] px-4 py-3 text-[0.68rem]" : "px-5 py-3 text-sm"
+            } ${
               isPrimary
                 ? "hud-primary hover:border-[var(--lab-cyan)] focus-visible:outline-[var(--lab-cyan)]"
                 : "text-white/80 hover:border-[var(--lab-gold)]/50 hover:text-white focus-visible:outline-[var(--lab-gold)]"
             }`}
           >
-            {action.label}
-            <Icon aria-hidden="true" size={17} />
+            <span aria-hidden="true" className="lab-scan-line" />
+            <span className="relative z-10">{action.label}</span>
+            <Icon aria-hidden="true" className="relative z-10" size={17} />
           </a>
         );
       })}
@@ -235,8 +275,10 @@ function HeroActions() {
 export default function HeroLab() {
   const wrapperRef = useRef(null);
   const frameRef = useRef(0);
+  const touchStartRef = useRef({ x: 0, y: 0 });
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState(1);
+  const isMobile = useIsMobile();
   const reduceMotion = useReducedMotion();
   const activeModule = heroModules[activeIndex] ?? heroModules[0];
 
@@ -252,6 +294,8 @@ export default function HeroLab() {
   }, []);
 
   useEffect(() => {
+    if (isMobile) return undefined;
+
     const updateFromScroll = () => {
       if (!wrapperRef.current) return;
 
@@ -285,7 +329,7 @@ export default function HeroLab() {
       window.removeEventListener("scroll", requestUpdate);
       window.removeEventListener("resize", requestUpdate);
     };
-  }, [updateActiveIndex]);
+  }, [isMobile, updateActiveIndex]);
 
   const scrollToModule = useCallback(
     (nextIndex) => {
@@ -304,6 +348,90 @@ export default function HeroLab() {
     },
     [reduceMotion, updateActiveIndex]
   );
+
+  const selectMobileModule = useCallback(
+    (nextIndex) => {
+      updateActiveIndex(nextIndex);
+    },
+    [updateActiveIndex]
+  );
+
+  const handleTouchStart = useCallback((event) => {
+    const touch = event.touches[0];
+    if (!touch) return;
+
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  }, []);
+
+  const handleTouchEnd = useCallback(
+    (event) => {
+      const touch = event.changedTouches[0];
+      if (!touch) return;
+
+      const deltaX = touch.clientX - touchStartRef.current.x;
+      const deltaY = touch.clientY - touchStartRef.current.y;
+
+      if (Math.abs(deltaX) < SWIPE_THRESHOLD || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+
+      updateActiveIndex(activeIndex + (deltaX < 0 ? 1 : -1));
+    },
+    [activeIndex, updateActiveIndex]
+  );
+
+  if (isMobile) {
+    return (
+      <section
+        ref={wrapperRef}
+        id="home"
+        className="relative min-h-[100svh] overflow-x-hidden px-4 pb-10 pt-24 text-white"
+      >
+        <div className="relative z-10 mx-auto flex w-full max-w-xl flex-col gap-4">
+          <div className="text-center">
+            <p className="lab-kicker text-[var(--lab-gold)]">{sectionContent.hero.eyebrow}</p>
+            <h1 className="heading mx-auto mt-2 max-w-4xl text-[clamp(2.4rem,15vw,4.6rem)] font-black leading-[0.86]">
+              {profile.displayName}
+            </h1>
+            <p className="lab-glow-text mono mx-auto mt-2 max-w-[18rem] text-[0.62rem] font-black uppercase tracking-[0.18em] text-[var(--lab-cyan-soft)]">
+              {profile.title}
+            </p>
+          </div>
+
+          <div
+            className="grid gap-3 [touch-action:pan-y]"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            <GlassRing
+              activeModule={activeModule}
+              direction={direction}
+              reduceMotion={reduceMotion}
+              motionAxis="horizontal"
+            />
+
+            <RingControls activeIndex={activeIndex} onSelect={selectMobileModule} />
+
+            <HeroActions compact />
+
+            <SideRail
+              activeModule={activeModule}
+              direction={direction}
+              reduceMotion={reduceMotion}
+              side="left"
+              mobile
+            />
+
+            <SideRail
+              activeModule={activeModule}
+              direction={direction}
+              reduceMotion={reduceMotion}
+              side="right"
+              mobile
+            />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
