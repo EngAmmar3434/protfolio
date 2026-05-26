@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import Lenis from "lenis";
+import "lenis/dist/lenis.css";
+import { Analytics } from "@vercel/analytics/react";
 
 import AnimatedBackground from "./components/AnimatedBackground";
 import ContactSection from "./components/ContactSection";
@@ -11,6 +13,7 @@ function App() {
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
+
     if (reduceMotion || isMobile) return undefined;
 
     const lenis = new Lenis({
@@ -20,6 +23,7 @@ function App() {
     });
 
     let frame;
+
     function raf(time) {
       lenis.raf(time);
       frame = requestAnimationFrame(raf);
@@ -44,6 +48,8 @@ function App() {
         <ProofSections />
         <ContactSection />
       </main>
+
+      <Analytics />
     </div>
   );
 }
