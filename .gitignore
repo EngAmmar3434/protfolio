@@ -22,3 +22,30 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+# Secrets / environment files
+.env
+.env.*
+!.env.example
+
+# AI/internal files
+.codex/
+
+# Test outputs
+test-results/
+playwright-report/
+coverage/
+
+# Personal documents
+src/**/*.pdf
+src/*.pdf
+public/*.pdf
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Deployment folders
+.vercel/
+.netlify/
